@@ -4,7 +4,9 @@ Objective: simple modular Colab notebook satisfying preprocessing, BoW, n-grams,
 
 Approved scope: local source in this folder, public repository `saltypal/Text_Analytics_Lab_Evaluation`, dataset publication and Git push, notebook execution by user in Colab. No local installs or pretrained model downloads. User selected Ollama `qwen3:0.6b` and one central notebook configuration cell.
 
-Decisions: 80/20 stratified split after exact-text deduplication; fixed seed; frozen pretrained embeddings; Logistic Regression and Linear SVM; limited static pretrained vocabulary to reduce download cost; raw natural text for pretrained models; five training-only few-shot demonstrations; identical ten-paper comparison subset. No test-driven hyperparameter search.
+Decisions: 80/20 stratified split after exact-text deduplication; fixed seed; frozen pretrained embeddings; Logistic Regression and Linear SVM; limited static pretrained vocabulary to reduce download cost; raw natural text for pretrained models; configurable training-only few-shot demonstrations; identical ten-paper comparison subset. No test-driven hyperparameter search.
+
+Latest requested layout: explicit Questions A–E; one dataset preview cell; A preprocessing/BoW split; B training/probability-generation split; C all embeddings/all classifiers/comparison split; D installer/loading function + directly editable system prompt, separate zero-shot and few-shot cells, two training examples per class by default; E styled metric tables, confusion matrices, detailed misclassification analysis. BoW remains a representation demonstration; the current notebook trains the eight required embedding classifiers.
 
 Acceptance: structurally valid notebook; first code cell fetches latest source, second installs dependencies, third configures everything; explicit preprocessing displays; eight embedding-classifier pairs; actual local lightweight execution using existing packages; no fabricated model results. Heavy pretrained and actual Ollama execution remain for Colab.
 

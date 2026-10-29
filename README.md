@@ -5,7 +5,7 @@
 Use **Runtime → Change runtime type → T4 GPU**, then run the notebook top to bottom.
 
 1. Code cell 1 clones the latest public `main` commit into a fresh disposable runtime directory. Rerun it after GitHub source updates; imports are refreshed. The printed commit identifies the code actually used.
-2. Code cell 2 installs Python dependencies and Ollama in Colab. Nothing needs installing on the local Windows computer.
+2. Code cell 2 installs Python dependencies. Question D installs and loads Ollama through `install_ollama_qwen()`. Nothing needs installing on the local Windows computer.
 3. Code cell 3 contains all adjustable experiment settings, including seed, split, embedding vocabulary limit, BERT batch/length/model, classifier settings and Ollama parameters.
 
 ## Included work
@@ -14,10 +14,16 @@ Use **Runtime → Change runtime type → T4 GPU**, then run the notebook top to
 - Training-fitted sparse Bag of Words and vocabulary counts.
 - Unigram, bigram and trigram models, Laplace-smoothed sequence/conditional probabilities, observed-count sample generation.
 - Pretrained Word2Vec, GloVe, FastText and frozen BERT embeddings.
-- **Logistic Regression and Linear SVM trained separately on each embedding: eight systems.** Both also run on BoW as a quick baseline.
-- **Ollama `qwen3:0.6b`**, thinking disabled, structured JSON labels: zero-shot and few-shot classification on the same 10 test papers. One training demonstration per class by default.
+- **Logistic Regression and Linear SVM trained separately on each embedding: eight systems.** One cell generates all embeddings; the next trains all eight classifiers; the following cell compares their results.
+- **Ollama `qwen3:0.6b`**, thinking disabled, structured JSON labels: zero-shot and few-shot classification in separate cells on the same 10 test papers. Two training demonstrations per class by default. Edit `SYSTEM_PROMPT` and inspect/choose `FEW_SHOT_PAPERS` directly in Question D.
 - Accuracy and macro precision, recall and F1; full-test ML results plus a fair paired 10-paper comparison including LLMs.
-- Confusion matrices, misclassified titles/abstracts, and simple query-based paper discovery.
+- Styled comparison tables, confusion matrices, and misclassified titles/abstracts with a summary of domain confusions.
+
+## Notebook presentation order
+
+After fetch/packages/config/setup, one cell previews the dataset. **A:** one preprocessing cell, one BoW cell. **B:** one n-gram construction cell, one probability/text-generation cell. **C:** one all-embedding generation cell, one all-classifier training cell, one comparison cell. **D:** one Ollama installation/loading function and editable system prompt cell, one zero-shot cell, one few-shot cell showing explicit training examples. **E:** a final metric comparison cell, confusion matrix cell, and paper-level error analysis cell. The final cell packages/downloads evidence.
+
+Zero-shot sends the system instructions and the single unseen paper being classified; no example papers or true labels. Few-shot adds only labeled training papers. Both evaluate exactly the same ten held-out papers.
 
 ## Small module layout
 
@@ -50,7 +56,7 @@ BERT and Qwen still need model downloads in Colab. Ollama is installed using its
 
 The supplied CSV has 1,000 rows, 200 per class. Eleven exact title/abstract duplicates are removed before splitting. The fixed split has 791 training and 198 test rows. Related template-like papers may still cross the split; scores do not establish performance on arbitrary real papers. Classifiers have fixed hyperparameters; test results are not used for tuning.
 
-Few-shot demonstrations come exclusively from training. The 10-paper LLM sample contains two papers per class and is reused for the paired ML comparison. Full-test and ten-paper results are separate; ten examples do not support a strong model-ranking claim. Invalid LLM output is retained as `INVALID` and scored as an error. A download/server failure raises an error instead of producing invented metrics.
+Few-shot demonstrations come exclusively from training. The 10-paper LLM test sample contains two papers per class and is reused for the paired ML comparison. Full-test and ten-paper results are separate; ten examples do not support a strong model-ranking claim. Invalid LLM output is retained as `INVALID` and scored as an error. A download/server failure raises an error instead of producing invented metrics.
 
 ## Outputs and recovery
 
