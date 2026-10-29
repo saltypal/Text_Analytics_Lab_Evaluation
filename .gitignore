@@ -4,3 +4,5 @@ work/
 cache/
 experiments/*/runs/
 *.pyc
+PLAN.md
+experiments/
