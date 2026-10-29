@@ -1,5 +1,7 @@
 # AI-powered Research Paper Discovery Assistant
 
+EXAM
+
 [Open in Google Colab](https://colab.research.google.com/github/saltypal/Text_Analytics_Lab_Evaluation/blob/main/lab.ipynb)
 
 Use **Runtime → Change runtime type → T4 GPU**, then run the notebook top to bottom.
@@ -14,10 +16,10 @@ Use **Runtime → Change runtime type → T4 GPU**, then run the notebook top to
 - Training-fitted sparse Bag of Words and vocabulary counts.
 - Unigram, bigram and trigram models, Laplace-smoothed sequence/conditional probabilities, observed-count sample generation.
 - Pretrained Word2Vec, GloVe, FastText and frozen BERT embeddings.
-- **Logistic Regression and Linear SVM trained separately on each embedding: eight systems.** One cell generates all embeddings; the next trains all eight classifiers; the following cell compares their results.
+- **Logistic Regression and Random Forest trained separately on each embedding: eight systems.** One cell generates all embeddings; the next trains all eight classifiers; the following cell compares their results.
 - **Ollama `qwen3:0.6b`**, thinking disabled, structured JSON labels: zero-shot and few-shot classification in separate cells on the same 10 test papers. Two training demonstrations per class by default. Edit `SYSTEM_PROMPT` and inspect/choose `FEW_SHOT_PAPERS` directly in Question D.
 - Accuracy and macro precision, recall and F1; full-test ML results plus a fair paired 10-paper comparison including LLMs.
-- Styled comparison tables, confusion matrices, and misclassified titles/abstracts with a summary of domain confusions.
+- Plain comparison tables, confusion matrices, and misclassified titles/abstracts with a summary of domain confusions.
 
 ## Notebook presentation order
 
@@ -67,6 +69,8 @@ The final notebook cell downloads a ZIP. **Also save the executed `.ipynb`** via
 To update imported code, edit the local modules, commit and push, then rerun cell 1 and subsequent cells. A notebook-cell change requires replacing that cell or reopening the latest GitHub notebook; cloning code cannot alter cells in an already open notebook.
 
 ## Validation performed
+
+Final submission switches the second classifier from Linear SVM to Random Forest (200 trees, configurable in the notebook), removes custom HTML/CSS/Styler, and explicitly displays LLM ground truth/correctness. Notebook schema/compilation checks and actual Logistic Regression/Random Forest smoke execution on real BoW features passed. This smoke check does not substitute for rerunning the eight embedding systems in Colab. The older run below predates the algorithm change.
 
 Local run `20261029T141514Z`: notebook schema and all 18 code-cell compilation checks passed. Real dataset preprocessing, split, BoW and both baseline classifiers executed; both achieved accuracy/macro-F1 1.000 on the 198-paper test split. N-gram normalization, sequence probability and generation checks passed. Embedding gzip readers/cache and Ollama payloads passed **mocked** tests. Actual pretrained embedding inference and Ollama/Qwen execution were not run locally and remain Colab checks. No local package installation was performed. Full local evidence is under `experiments/local_validation/runs/20261029T141514Z/` (excluded from Git).
 

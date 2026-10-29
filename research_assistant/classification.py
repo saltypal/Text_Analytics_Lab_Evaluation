@@ -7,7 +7,7 @@ import seaborn as sns
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
 from .preprocessing import LABELS
 
@@ -16,14 +16,16 @@ def metrics(name, truth, predictions, scope):
     return {'System': name, 'Scope': scope, 'N': len(truth), 'Accuracy': accuracy_score(truth, predictions),
             'Precision (macro)': p, 'Recall (macro)': r, 'F1 (macro)': f}
 
-def train_classifiers(name, x_train, x_test, train, test, seed=42, logistic_c=1.0, svm_c=1.0, max_iter=3000):
+def train_classifiers(name, x_train, x_test, train, test, seed=42, logistic_c=1.0, max_iter=3000,
+                      rf_trees=200, rf_max_depth=None, rf_min_samples_leaf=1):
     results, predictions, models = [], {}, {}
     for classifier, estimator in [('Logistic Regression', LogisticRegression(C=logistic_c, max_iter=max_iter, random_state=seed)),
-                                  ('Linear SVM', LinearSVC(C=svm_c, max_iter=max_iter, random_state=seed, dual='auto'))]:
+                                  ('Random Forest', RandomForestClassifier(n_estimators=rf_trees, max_depth=rf_max_depth,
+                                    min_samples_leaf=rf_min_samples_leaf, random_state=seed, n_jobs=-1))]:
         key = f'{name} + {classifier}'
         start = time.perf_counter()
         print(f'Training {key} ...', flush=True)
-        model = make_pipeline(StandardScaler(with_mean=False), estimator)
+        model = make_pipeline(StandardScaler(with_mean=False), estimator) if classifier == 'Logistic Regression' else estimator
         model.fit(x_train, train.research_domain)
         pred = model.predict(x_test)
         results.append(metrics(key, test.research_domain, pred, 'Full test'))
