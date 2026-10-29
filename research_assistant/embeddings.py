@@ -92,24 +92,24 @@ def mean_embeddings(texts, vectors, dim):
     print(f'Token coverage: {matched/max(total, 1):.1%}; zero-vector documents: {empty}/{len(texts)}')
     return matrix
 
-def bert_embeddings(texts, cache_dir, model_name='google-bert/bert-base-uncased', batch_size=16):
+def bert_embeddings(texts, cache_dir, model_name='google-bert/bert-base-uncased', batch_size=16, max_length=256):
     import torch
     from transformers import AutoTokenizer, AutoModel
     texts = list(texts)
-    digest = hashlib.sha256((model_name+'\n'+'\n'.join(texts)).encode()).hexdigest()[:16]
+    digest = hashlib.sha256((model_name+str(max_length)+'\n'+'\n'.join(texts)).encode()).hexdigest()[:16]
     cache = Path(cache_dir) / f'bert-{digest}.npy'
     cache.parent.mkdir(parents=True, exist_ok=True)
     if cache.exists():
         print(f'Loading cached BERT embeddings: {cache}')
         return np.load(cache)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f'BERT: {model_name}, device={device}, max_length=256, masked mean pooling.', flush=True)
+    print(f'BERT: {model_name}, device={device}, max_length={max_length}, masked mean pooling.', flush=True)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModel.from_pretrained(model_name).to(device).eval()
     matrices = []
     with torch.inference_mode():
         for start in tqdm(range(0, len(texts), batch_size), desc='BERT batches'):
-            batch = tokenizer(texts[start:start+batch_size], padding=True, truncation=True, max_length=256, return_tensors='pt').to(device)
+            batch = tokenizer(texts[start:start+batch_size], padding=True, truncation=True, max_length=max_length, return_tensors='pt').to(device)
             hidden = model(**batch).last_hidden_state
             mask = batch['attention_mask'].unsqueeze(-1)
             pooled = (hidden * mask).sum(1) / mask.sum(1).clamp(min=1)

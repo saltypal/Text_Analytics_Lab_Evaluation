@@ -19,7 +19,7 @@ def preprocess_steps(text):
     return {'original': text, 'tokenization': tokenized, 'case_folding': folded,
             'stopword_removal': filtered, 'stemming': stemmed, 'processed': ' '.join(stemmed)}
 
-def prepare_data(path, seed=42):
+def prepare_data(path, seed=42, test_size=0.2):
     df = pd.read_csv(path)
     required = ['paper_id', 'title', 'abstract', 'research_domain']
     if not set(required).issubset(df.columns):
@@ -35,7 +35,7 @@ def prepare_data(path, seed=42):
     before = len(df)
     df = df.drop_duplicates('_key').reset_index(drop=True)
     df['processed'] = df.text.map(lambda x: preprocess_steps(x)['processed'])
-    train, test = train_test_split(df, test_size=0.2, random_state=seed, stratify=df.research_domain)
+    train, test = train_test_split(df, test_size=test_size, random_state=seed, stratify=df.research_domain)
     train, test = train.reset_index(drop=True), test.reset_index(drop=True)
     assert set(train._key).isdisjoint(set(test._key))
     print(f'Loaded {before} rows; removed {before-len(df)} exact text duplicates. Train={len(train)}, test={len(test)}')

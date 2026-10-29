@@ -16,10 +16,10 @@ def metrics(name, truth, predictions, scope):
     return {'System': name, 'Scope': scope, 'N': len(truth), 'Accuracy': accuracy_score(truth, predictions),
             'Precision (macro)': p, 'Recall (macro)': r, 'F1 (macro)': f}
 
-def train_classifiers(name, x_train, x_test, train, test):
+def train_classifiers(name, x_train, x_test, train, test, seed=42, logistic_c=1.0, svm_c=1.0, max_iter=3000):
     results, predictions, models = [], {}, {}
-    for classifier, estimator in [('Logistic Regression', LogisticRegression(max_iter=2000, random_state=42)),
-                                  ('Linear SVM', LinearSVC(max_iter=10000, random_state=42, dual='auto'))]:
+    for classifier, estimator in [('Logistic Regression', LogisticRegression(C=logistic_c, max_iter=max_iter, random_state=seed)),
+                                  ('Linear SVM', LinearSVC(C=svm_c, max_iter=max_iter, random_state=seed, dual='auto'))]:
         key = f'{name} + {classifier}'
         start = time.perf_counter()
         print(f'Training {key} ...', flush=True)
@@ -38,8 +38,11 @@ def confusion_plots(predictions, test, output_dir, prefix='full'):
     fig, axes = plt.subplots(int(np.ceil(len(predictions)/2)), 2, figsize=(16, 5*int(np.ceil(len(predictions)/2))), squeeze=False)
     short = ['NLP', 'Health AI', 'Cybersec', 'Vision', 'Robotics']
     for ax, (name, pred) in zip(axes.flat, predictions.items()):
-        cm = confusion_matrix(test.research_domain, pred, labels=LABELS)
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=short, yticklabels=short, ax=ax, cbar=False)
+        invalid = any(label not in LABELS for label in pred)
+        labels = LABELS + ['INVALID'] if invalid else LABELS
+        ticks = short + ['INVALID'] if invalid else short
+        cm = confusion_matrix(test.research_domain, pred, labels=labels)
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=ticks, yticklabels=ticks, ax=ax, cbar=False)
         ax.set(title=name, xlabel='Predicted domain', ylabel='True domain')
     for ax in list(axes.flat)[len(predictions):]:
         ax.set_visible(False)
