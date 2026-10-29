@@ -60,8 +60,6 @@ The final notebook cell downloads a ZIP. **Also save the executed `.ipynb`** via
 
 To update imported code, edit the local modules, commit and push, then rerun cell 1 and subsequent cells. A notebook-cell change requires replacing that cell or reopening the latest GitHub notebook; cloning code cannot alter cells in an already open notebook.
 
-## Sources
-
 ## Validation performed
 
 Local run `20261029T141514Z`: notebook schema and all 18 code-cell compilation checks passed. Real dataset preprocessing, split, BoW and both baseline classifiers executed; both achieved accuracy/macro-F1 1.000 on the 198-paper test split. N-gram normalization, sequence probability and generation checks passed. Embedding gzip readers/cache and Ollama payloads passed **mocked** tests. Actual pretrained embedding inference and Ollama/Qwen execution were not run locally and remain Colab checks. No local package installation was performed. Full local evidence is under `experiments/local_validation/runs/20261029T141514Z/` (excluded from Git).
